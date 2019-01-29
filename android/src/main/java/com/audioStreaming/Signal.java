@@ -190,7 +190,7 @@ public class Signal extends Service implements OnErrorListener,
         remoteViews.setOnClickPendingIntent(R.id.btn_streaming_notification_play, makePendingIntent(BROADCAST_PLAYBACK_PLAY));
         remoteViews.setOnClickPendingIntent(R.id.btn_streaming_notification_stop, makePendingIntent(BROADCAST_EXIT));
         notifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-    
+
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel =
                     new NotificationChannel("com.audioStreaming", "Audio Streaming",
@@ -201,7 +201,7 @@ public class Signal extends Service implements OnErrorListener,
 
             notifyBuilder.setChannelId("com.audioStreaming");
             notifyBuilder.setOnlyAlertOnce(true);
-            
+
         }
         notifyManager.notify(NOTIFY_ME_ID, notifyBuilder.build());
     }
@@ -238,6 +238,10 @@ public class Signal extends Service implements OnErrorListener,
         sendBroadcast(new Intent(Mode.START_PREPARING));
 
         try {
+            // Refs:
+            // https://github.com/Khang-NT/aacdecoder-android/issues/57
+            // https://stackoverflow.com/questions/24694868/start-new-stream-with-aacdecoder
+            this.aacPlayer.setPlayerCallback(this);
             this.aacPlayer.playAsync(this.streamingURL);
         } catch (Exception e) {
             e.printStackTrace();
